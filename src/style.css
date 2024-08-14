@@ -1,8 +1,22 @@
 :root{
+    background-color: #222;
+    /* background-image: url("https://wallpapers.com/images/featured/4k-nature-ztbad1qj8vdjqe0p.jpg"); */
+    background-repeat: no-repeat;
+    background-size: cover;
     min-height: 100vh;
-    background: linear-gradient(#04003a, #050135);
     font-family: Arial, Helvetica, sans-serif;
     color: antiquewhite;
+}
+.hide{
+    display: none;
+}
+#main{
+    position: relative;
+}
+#signOut{
+    position: absolute;
+    top: 1.2em;
+    right: 0;
 }
 h1{
     color: yellow;
@@ -13,12 +27,12 @@ body{
     max-width: 800px;
     margin: 0 auto;
 }
-form{
+#taskinputform{
     width: fit-content;
     margin: 1em auto;
     padding: 0;
 }
-input{
+#taskinputform input{
     border: none;
     outline: none;
     padding: 0.8em;
@@ -28,10 +42,10 @@ input{
     background-color: transparent;
     border-bottom: #0067c7 3px solid;
 }
-input:focus{
+#taskinputform input:focus{
     border-bottom: aqua 3px solid;
 }
-button{
+#taskinputform button{
     border: none;
     outline: none;
     padding: 0.8em 2em;
@@ -43,7 +57,7 @@ button{
     font-weight: 800;
     margin: 0;
 }
-button:hover{
+#taskinputform button:hover{
     background-color: aqua;
 }
 .tasks{
@@ -64,11 +78,17 @@ button:hover{
 }
 .deleteBtn{
     background-color: red;
+    color: aliceblue;
     padding: 0.4em;
     font-size: 0.8em;
     position: absolute;
     right: 5px;
     top: 26%;
+    border: none;
+    outline: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-weight: 800;
 }
 .deleteBtn:hover{
     background-color: hsl(0, 100%, 60%);

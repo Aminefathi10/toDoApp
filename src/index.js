@@ -1,6 +1,7 @@
 import "./style.css";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, onSnapshot, addDoc, doc, deleteDoc, serverTimestamp, orderBy, query, where } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth"
 
 const firebaseConfig = {
     apiKey: "AIzaSyBOw5tluoIwW-sVdxD8-ojrMot-kfEsiro",
@@ -12,17 +13,59 @@ const firebaseConfig = {
   };
 initializeApp(firebaseConfig);
 const db = getFirestore();
+const auth = getAuth();
 const colRef = collection(db, "tasks");
 const q = query(colRef, orderBy("createdAt", "desc"));
+const userId = null;
 
-const tasksContainer = document.querySelector(".tasks");
+// sign up function
+const signUnForm = document.getElementById("signupForm")
+signUnForm.addEventListener("submit", e => {
+    e.preventDefault();
+    createUserWithEmailAndPassword(auth, e.target.email.value, e.target.password.value)
+    e.target.reset();
+});
+
+// sign in
+const signInForm = document.getElementById("signinForm")
+signInForm.addEventListener("submit", e => {
+    e.preventDefault();
+    signInWithEmailAndPassword(auth, e.target.email.value, e.target.password.value)
+    e.target.reset();
+});
+
+// switch between sign in and out
+document.querySelectorAll(".switch").forEach(btn => {
+    btn.addEventListener("click", () => {
+        signInForm.classList.toggle("hide");
+        signUnForm.classList.toggle("hide");
+    })
+})
+
+// sign out
+document.getElementById("signOut")
+.addEventListener("click", () => signOut(auth) );
+
+// subscribe to auth state change
+onAuthStateChanged(auth, user => {
+    console.log(user)
+    if (user) {
+        document.getElementById("main").classList.remove("hide");
+        document.getElementById("auth").classList.add("hide");
+    } else {
+        document.getElementById("main").classList.add("hide");
+        document.getElementById("auth").classList.remove("hide");
+    }
+    
+});
 
 function renderTasks(tasks){
+const tasksContainer = document.querySelector(".tasks");
     tasksContainer.innerHTML = tasks.map((t, i) => `<div class="task" id="${i}">
     <p>${t.task}</p>
     <button data-id="${t.id}" class="deleteBtn">Delete</button>
     </div>`).join("");
-    
+
     document.querySelectorAll(".deleteBtn").forEach(btn => {
         btn.addEventListener("click", () => {
             const id = btn.getAttribute("data-id");
@@ -31,6 +74,7 @@ function renderTasks(tasks){
     })
 }
 
+// get data and render it
 onSnapshot(q, snap => {
     let tasks = [];
     snap.docs.forEach(doc => {
@@ -39,16 +83,17 @@ onSnapshot(q, snap => {
             ...doc.data()
         });
     });
-    console.log(tasks)
     renderTasks(tasks);
 });
 
+// delete task
 function deleteTask(id) {
     const tasktobedeleted = doc(db, "tasks", id);
     deleteDoc(tasktobedeleted);
 }
 
-const form = document.getElementById("myForm");
+// add task
+const form = document.getElementById("taskinputform");
 form.addEventListener("submit", e => {
     e.preventDefault();
     addDoc(colRef, {
