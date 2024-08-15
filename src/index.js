@@ -1,7 +1,8 @@
 import "./style.css";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, onSnapshot, addDoc, doc, deleteDoc, serverTimestamp, orderBy, query, where } from "firebase/firestore";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth"
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyBOw5tluoIwW-sVdxD8-ojrMot-kfEsiro",
@@ -15,14 +16,15 @@ initializeApp(firebaseConfig);
 const db = getFirestore();
 const auth = getAuth();
 const colRef = collection(db, "tasks");
-const q = query(colRef, orderBy("createdAt", "desc"));
-const userId = null;
+const currentUser = null;
+
 
 // sign up function
 const signUnForm = document.getElementById("signupForm")
 signUnForm.addEventListener("submit", e => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, e.target.email.value, e.target.password.value)
+    .then(cre => console.log(cre.user))
     e.target.reset();
 });
 
@@ -31,6 +33,21 @@ const signInForm = document.getElementById("signinForm")
 signInForm.addEventListener("submit", e => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, e.target.email.value, e.target.password.value)
+    .then(cre => {
+        const q = query(colRef, where("uid", "==", cre.user.uid, orderBy("createdAt", "desc")));
+        currentUser = re.user.uid;
+        onSnapshot(q, snap => {
+            let tasks = [];
+            snap.docs.forEach(doc => {
+                tasks.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            renderTasks(tasks);
+        });
+    })
+    .catch(error => console.log(error))
     e.target.reset();
 });
 
@@ -48,7 +65,6 @@ document.getElementById("signOut")
 
 // subscribe to auth state change
 onAuthStateChanged(auth, user => {
-    console.log(user)
     if (user) {
         document.getElementById("main").classList.remove("hide");
         document.getElementById("auth").classList.add("hide");
@@ -56,7 +72,18 @@ onAuthStateChanged(auth, user => {
         document.getElementById("main").classList.add("hide");
         document.getElementById("auth").classList.remove("hide");
     }
-    
+}); 
+
+// get data and render it
+onSnapshot(q, snap => {
+    let tasks = [];
+    snap.docs.forEach(doc => {
+        tasks.push({
+            id: doc.id,
+            ...doc.data()
+        });
+    });
+    renderTasks(tasks);
 });
 
 function renderTasks(tasks){
@@ -74,17 +101,9 @@ const tasksContainer = document.querySelector(".tasks");
     })
 }
 
-// get data and render it
-onSnapshot(q, snap => {
-    let tasks = [];
-    snap.docs.forEach(doc => {
-        tasks.push({
-            id: doc.id,
-            ...doc.data()
-        });
-    });
-    renderTasks(tasks);
-});
+
+
+
 
 // delete task
 function deleteTask(id) {
@@ -97,6 +116,7 @@ const form = document.getElementById("taskinputform");
 form.addEventListener("submit", e => {
     e.preventDefault();
     addDoc(colRef, {
+        uid: currentUser,
         task: form["task"].value,
         createdAt: serverTimestamp()
     });
