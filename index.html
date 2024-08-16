@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>toDoApp</title>
+</head>
+<body>
+    <div class="hide" id="main">
+        <h1>today's tasks</h1>
+        <button id="signOut">Sign out</button>
+    <form id="taskinputform">
+        <input placeholder="Enter a task" type="text" name="task" id="input" required />
+        <button type="submit">Submit</button>
+    </form>
+    <div class="tasks">
+    </div>
+    </div>
+    <div id="auth">
+        <form id="signupForm">
+            <input name="email" type="text" placeholder="Enter email" id="upemail">
+            <input name="password" type="password" placeholder="Enter password" id="uppassword">
+            <button type="submit">sign up</button>
+            <button type="button" class="switch">Registered? Sign in</button>
+        </form>
+        <form class="hide" id="signinForm">
+            <input name="email" type="text" placeholder="Enter email" id="inemail">
+            <input name="password" type="password" placeholder="Enter password" id="inpassword">
+            <button type="submit">sign in</button>
+            <button type="button" class="switch">don't have an account? Sign un</button>
+        </form>
+        
+    </div>
+    <script type="module" src="./bundle.js"></script>
+</body>
+</html>
